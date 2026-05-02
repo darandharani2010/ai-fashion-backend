@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require("@google-ai/generativai");
 
 exports.handler = async (event, context) => {
-  // CORS Headers to fix the "Backend is live" error
+  // These headers allow your Durable site to talk to Netlify
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
@@ -19,11 +19,10 @@ exports.handler = async (event, context) => {
     const data = JSON.parse(event.body);
     const userMessage = data.message;
 
-    // AI Stylist Instructions
-    const prompt = `You are a professional Indian fashion stylist. 
-    The user is looking for: "${userMessage}". 
-    Provide a professional style tip (2-3 sentences) on how to wear this.
-    End with: "You can find my top recommended picks on my Amazon shop below!"`;
+    // The AI's instructions
+    const prompt = `You are a professional fashion expert for Sai Enterprises. 
+    The user wants to know about: "${userMessage}". 
+    Give a 2-sentence style tip and then say: "Check out my curated selection on Amazon below!"`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -35,11 +34,10 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ reply: text }),
     };
   } catch (error) {
-    console.error(error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: "Check GEMINI_KEY in Netlify settings" }),
+      body: JSON.stringify({ error: "Connection failed. Check Netlify Environment Variables." }),
     };
   }
 };
